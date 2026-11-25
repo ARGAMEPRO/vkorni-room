@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Комната памяти — демо</title>
+<meta name="description" content="Интерактивная комната памяти в браузере: слои, свет, предметы с историей.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" id="room" aria-label="Комната памяти: нажимайте на предметы">
+    <defs>
+      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2b241d"/><stop offset=".55" stop-color="#221c17"/><stop offset="1" stop-color="#1a1512"/>
+      </linearGradient>
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1e1713"/><stop offset="1" stop-color="#120d0b"/>
+      </linearGradient>
+      <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1d2f3d"/><stop offset=".55" stop-color="#2a4051"/><stop offset="1" stop-color="#4a5548"/>
+      </linearGradient>
+      <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4b382a"/><stop offset="1" stop-color="#33251c"/>
+      </linearGradient>
+      <linearGradient id="fabric" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4a3a33"/><stop offset="1" stop-color="#33261f"/>
+      </linearGradient>
+      <radialGradient id="lampglow" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#ffcf8a" stop-opacity=".55"/>
+        <stop offset="45%" stop-color="#f0a95c" stop-opacity=".18"/>
+        <stop offset="100%" stop-color="#f0a95c" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0" stop-color="#b9c9d6" stop-opacity=".22"/>
+        <stop offset="1" stop-color="#b9c9d6" stop-opacity="0"/>
+      </linearGradient>
+      <pattern id="stripes" width="86" height="8" patternUnits="userSpaceOnUse">
+        <rect width="86" height="8" fill="none"/><rect width="1.5" height="8" fill="#ffffff" opacity=".025"/>
+      </pattern>
+      <filter id="soft"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="softer"><feGaussianBlur stdDeviation="22"/></filter>
+      <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" result="n"/>
+        <feColorMatrix in="n" type="saturate" values="0" result="m"/>
+        <feComponentTransfer in="m" result="s"><feFuncA type="linear" slope=".05"/></feComponentTransfer>
+        <feBlend in="SourceGraphic" in2="s" mode="overlay"/>
+      </filter>
+    </defs>
+
+    <!-- стена и пол -->
+    <g id="layer-back">
+      <rect width="1600" height="660" fill="url(#wall)"/>
+      <rect width="1600" height="660" fill="url(#stripes)"/>
+      <rect y="646" width="1600" height="16" fill="#0f0b09" opacity=".85"/>
+      <rect y="660" width="1600" height="240" fill="url(#floor)"/>
+      <g stroke="#000" stroke-opacity=".22" stroke-width="2">
+        <path d="M800 660 L-260 900"/><path d="M800 660 L120 900"/><path d="M800 660 L470 900"/>
+        <path d="M800 660 L860 900"/><path d="M800 660 L1160 900"/><path d="M800 660 L1520 900"/><path d="M800 660 L1900 900"/>
+      </g>
+      <g stroke="#000" stroke-opacity=".18" stroke-width="2">
+        <path d="M0 700 H1600"/><path d="M0 760 H1600"/><path d="M0 840 H1600"/>
+      </g>
+    </g>
+
+    <!-- окно -->
+    <g id="layer-window">
+      <rect x="120" y="120" width="440" height="350" fill="#120e0b"/>
+      <rect x="132" y="132" width="416" height="326" fill="url(#night)"/>
+      <g fill="#0f1a20" opacity=".9">
+        <path d="M132 400 L200 360 L260 392 L330 352 L400 386 L470 356 L548 392 L548 458 L132 458 Z"/>
+      </g>
+      <path d="M132 458 L548 458 L548 452 L132 452 Z" fill="#2b3a3f"/>
+      <g stroke="#2a201a" stroke-width="12">
+        <path d="M340 132 V458"/><path d="M132 292 H548"/>
+        <rect x="120" y="120" width="440" height="350" fill="none"/>
+      </g>
+      <path d="M120 470 H560" stroke="#3b2e24" stroke-width="14"/>
+      <!-- шторы -->
+      <path d="M110 118 Q150 300 118 480 L172 480 Q196 300 168 118 Z" fill="#2c231c"/>
+      <path d="M570 118 Q530 300 562 480 L508 480 Q484 300 512 118 Z" fill="#2c231c"/>
+      <path d="M138 140 Q162 300 142 460" stroke="#3a2f26" stroke-width="3" fill="none" opacity=".7"/>
+      <path d="M542 140 Q518 300 538 460" stroke="#3a2f26" stroke-width="3" fill="none" opacity=".7"/>
+      <!-- подсветка от окна -->
+      <path d="M120 470 L560 470 L760 900 L60 900 Z" fill="url(#beam)" opacity=".55" filter="url(#softer)"/>
+    </g>
+
+    <!-- рамки на стене -->
+    <g id="layer-wall">
+      <g class="hot" data-open="photos" tabindex="0" role="button" aria-label="Фотографии">
+        <rect x="676" y="176" width="126" height="156" fill="#4a3627"/>
+        <rect x="688" y="188" width="102" height="132" fill="#6f6350"/>
+        <rect x="698" y="198" width="82" height="112" fill="#c7b593" opacity=".85"/>
+        <path d="M698 280 L726 254 L748 272 L770 246 L780 258 L780 310 L698 310 Z" fill="#8a7a5a" opacity=".75"/>
+        <circle cx="712" cy="216" r="7" fill="#efe0bd" opacity=".8"/>
+        <rect x="830" y="196" width="150" height="112" fill="#4a3627"/>
+        <rect x="841" y="207" width="128" height="90" fill="#6f6350"/>
+        <rect x="851" y="217" width="108" height="70" fill="#c7b593" opacity=".85"/>
+        <path d="M851 287 L880 268 L910 282 L940 262 L959 274 L959 287 Z" fill="#8a7a5a" opacity=".75"/>
+        <circle cx="930" cy="240" r="8" fill="#efe0bd" opacity=".8"/>
+        <circle class="dot" cx="739" cy="254" r="7"/>
+        <circle class="dot" cx="905" cy="252" r="7"/>
+      </g>
+      <g class="hot" data-open="video" tabindex="0" role="button" aria-label="Видео">
+        <rect x="1010" y="178" width="118" height="150" fill="#4a3627"/>
+        <rect x="1021" y="189" width="96" height="128" fill="#1c1611"/>
+        <path d="M1059 253 L1059 229 L1085 241 Z" fill="#c9bda3"/>
+        <circle class="dot" cx="1069" cy="253" r="7"/>
+      </g>
+    </g>
+
+    <!-- полка -->
+    <g id="layer-shelf">
+      <rect x="1120" y="352" width="420" height="12" fill="#3a2c22"/>
+      <rect x="1120" y="364" width="420" height="5" fill="#1a120e" opacity=".8"/>
+      <g>
+        <rect x="1140" y="286" width="16" height="66" fill="#5a3b2c"/>
+        <rect x="1158" y="296" width="14" height="56" fill="#3f4a3c"/>
+        <rect x="1174" y="290" width="18" height="62" fill="#6b5540"/>
+        <rect x="1194" y="302" width="12" height="50" fill="#4a3a4a"/>
+        <rect x="1208" y="292" width="16" height="60" fill="#5f4a35"/>
+        <rect x="1228" y="300" width="13" height="52" fill="#3b4a4a"/>
+      </g>
+      <g>
+        <rect x="1420" y="296" width="52" height="56" rx="4" fill="#40332a"/>
+        <circle cx="1446" cy="324" r="16" fill="#c9b48a" opacity=".35"/>
+        <circle cx="1446" cy="324" r="2" fill="#e8dcc0"/>
+        <path d="M1446 324 V312" stroke="#e8dcc0" stroke-width="1.6"/>
+        <path d="M1446 324 H1456" stroke="#e8dcc0" stroke-width="1.6"/>
+      </g>
+      <g>
+        <rect x="1490" y="300" width="34" height="52" rx="5" fill="#4a3a2c"/>
+        <path d="M1496 306 Q1507 322 1496 346" stroke="#6b5540" stroke-width="3" fill="none"/>
+      </g>
+    </g>
+
+    <!-- комод со шкатулкой и патефоном -->
+    <g id="layer-sideboard">
+      <ellipse cx="345" cy="664" rx="176" ry="20" fill="#000" opacity=".5" filter="url(#soft)"/>
+      <rect x="180" y="462" width="330" height="16" rx="3" fill="#4e3a2b"/>
+      <rect x="192" y="478" width="306" height="168" fill="url(#wood)"/>
+      <rect x="204" y="492" width="130" height="140" fill="#3d2d22"/>
+      <rect x="346" y="492" width="140" height="140" fill="#3d2d22"/>
+      <circle cx="318" cy="562" r="4" fill="#8a7355"/><circle cx="362" cy="562" r="4" fill="#8a7355"/>
+      <rect x="196" y="646" width="10" height="20" fill="#241a13"/><rect x="486" y="646" width="10" height="20" fill="#241a13"/>
+
+      <g class="hot" data-open="letters" tabindex="0" role="button" aria-label="Шкатулка с письмами">
+        <rect x="222" y="416" width="112" height="46" rx="5" fill="#5c4530"/>
+        <rect x="222" y="402" width="112" height="18" rx="5" fill="#6d5339"/>
+        <rect x="266" y="422" width="24" height="12" rx="3" fill="#b39a6c"/>
+        <path d="M222 424 H334" stroke="#3a2a1d" stroke-width="1.5" opacity=".7"/>
+        <circle class="dot" cx="278" cy="430" r="7"/>
+      </g>
+
+      <g class="hot" data-open="voice" tabindex="0" role="button" aria-label="Патефон с записью">
+        <rect x="368" y="408" width="126" height="54" rx="6" fill="#4a3627"/>
+        <rect x="368" y="404" width="126" height="12" rx="5" fill="#57402e"/>
+        <rect x="382" y="424" width="98" height="24" rx="4" fill="#2a1f18"/>
+        <circle cx="404" cy="436" r="9" fill="#8a7355"/><circle cx="404" cy="436" r="3" fill="#241a13"/>
+        <rect x="424" y="430" width="44" height="10" rx="3" fill="#3b2c21"/>
+        <path d="M420 470 L420 486" stroke="#c8b08a" stroke-width="4"/>
+        <circle class="dot" cx="430" cy="436" r="7"/>
+      </g>
+    </g>
+
+    <!-- кресло -->
+    <g id="layer-chair">
+      <ellipse cx="700" cy="716" rx="180" ry="26" fill="#000" opacity=".45" filter="url(#soft)"/>
+      <rect x="534" y="446" width="272" height="180" rx="34" fill="url(#fabric)"/>
+      <rect x="560" y="470" width="220" height="120" rx="26" fill="#4f3d34"/>
+      <path d="M566 492 q104 -30 208 0 l-6 30 q-98 -22 -196 0 Z" fill="#6b5646" opacity=".75"/>
+      <rect x="536" y="580" width="268" height="78" rx="18" fill="#3b2d26"/>
+      <rect x="560" y="568" width="220" height="44" rx="14" fill="#5a4639"/>
+      <rect x="500" y="540" width="48" height="132" rx="22" fill="#42332b"/>
+      <rect x="792" y="540" width="48" height="132" rx="22" fill="#42332b"/>
+      <rect x="506" y="556" width="36" height="14" rx="7" fill="#544134" opacity=".8"/>
+      <rect x="798" y="556" width="36" height="14" rx="7" fill="#544134" opacity=".8"/>
+      <rect x="548" y="656" width="16" height="30" rx="4" fill="#2a1f19"/>
+      <rect x="776" y="656" width="16" height="30" rx="4" fill="#2a1f19"/>
+      <g class="hot" data-open="letter-chair" tabindex="0" role="button" aria-label="Плед">
+        <circle class="dot" cx="700" cy="590" r="7"/>
+      </g>
+    </g>
+
+    <!-- столик с лампой -->
+    <g id="layer-table">
+      <ellipse class="lamp-glow" id="lampGlow" cx="1236" cy="470" rx="430" ry="360" fill="url(#lampglow)" opacity=".95"/>
+      <ellipse cx="1235" cy="682" rx="150" ry="16" fill="#000" opacity=".45" filter="url(#soft)"/>
+      <rect x="1090" y="556" width="290" height="14" rx="4" fill="#4e3a2b"/>
+      <rect x="1112" y="570" width="12" height="106" fill="#33251c"/>
+      <rect x="1346" y="570" width="12" height="106" fill="#33251c"/>
+      <g class="hot" data-open="lamp" tabindex="0" role="button" aria-label="Лампа">
+        <path d="M1206 556 L1206 500" stroke="#6b5a44" stroke-width="6"/>
+        <path d="M1168 500 L1244 500 L1228 456 L1184 456 Z" fill="#c8a86a"/>
+        <ellipse cx="1206" cy="500" rx="38" ry="7" fill="#efd3a0"/>
+        <ellipse class="lamp-core" id="lampCore" cx="1206" cy="520" rx="150" ry="130" fill="url(#lampglow)" opacity=".8"/>
+        <circle class="dot" cx="1206" cy="478" r="7"/>
+      </g>
+      <g>
+        <rect x="1250" y="534" width="86" height="8" rx="2" fill="#3b2e24"/>
+        <rect x="1258" y="526" width="80" height="8" rx="2" fill="#4a3a2c"/>
+      </g>
+    </g>
+
+    <!-- растение -->
+    <g id="layer-plant">
+      <path d="M1470 646 L1520 646 L1512 700 L1478 700 Z" fill="#4a3627"/>
+      <g stroke="#3c4a35" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M1495 646 q-30 -40 -44 -78"/><path d="M1495 646 q4 -54 -6 -96"/>
+        <path d="M1495 646 q34 -44 44 -84"/><path d="M1495 646 q46 -30 62 -58"/>
+      </g>
+      <g fill="#465c3e" opacity=".9">
+        <ellipse cx="1448" cy="566" rx="26" ry="13" transform="rotate(-32 1448 566)"/>
+        <ellipse cx="1484" cy="546" rx="24" ry="12" transform="rotate(-8 1484 546)"/>
+        <ellipse cx="1540" cy="560" rx="26" ry="13" transform="rotate(26 1540 560)"/>
+        <ellipse cx="1556" cy="588" rx="24" ry="12" transform="rotate(38 1556 588)"/>
+      </g>
+    </g>
+
+    <!-- пыль в воздухе -->
+    <g id="layer-dust" class="dust">
+      <circle cx="330" cy="430" r="2.2"/><circle cx="470" cy="520" r="1.6"/><circle cx="640" cy="380" r="2"/>
+      <circle cx="760" cy="470" r="1.4"/><circle cx="900" cy="420" r="2.4"/><circle cx="1010" cy="520" r="1.8"/>
+      <circle cx="1150" cy="390" r="1.5"/><circle cx="1290" cy="460" r="2.2"/><circle cx="1400" cy="400" r="1.7"/>
+      <circle cx="560" cy="330" r="1.5"/><circle cx="1236" cy="560" r="2.6"/><circle cx="860" cy="330" r="1.6"/>
+    </g>
+  </svg>
+
+  <div class="vignette"></div>
+  <div class="cap">
+    <span class="cap-line">Иван Петрович · 1938–2016</span>
+    <span class="cap-sub">учитель, фотограф, хозяин дома у реки</span>
+  </div>
+</div>
+
+<div class="hint" id="hint">Нажимайте на предметы · камера двигается за курсором</div>
+
+<div class="intro" id="intro">
+  <div class="intro-inner">
+    <p class="intro-eyebrow">Вкорни · демонстрационная комната</p>
+    <h1>Комната<br><em>памяти</em></h1>
+    <p class="intro-text">Здесь живёт история одного человека. Пройдитесь взглядом по комнате и нажмите
+      на вещи, которые он оставил: письма, запись голоса, фотографии.</p>
+    <button class="intro-btn" id="enter">Войти в комнату</button>
+    <p class="intro-note">Звук включится только по вашему нажатию</p>
+  </div>
+</div>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" id="close" aria-label="Закрыть">×</button>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
