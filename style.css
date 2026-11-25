@@ -188,3 +188,13 @@ body{
   .modal-box{max-height:88vh;border-radius:14px}
   .letter{font-size:16px;line-height:1.6}
 }
+
+/* переключатель версий */
+.switch{
+  position:fixed;top:20px;right:22px;z-index:15;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;text-decoration:none;color:#a99e8f;
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+  background:rgba(20,16,13,.55);backdrop-filter:blur(6px);transition:.25s;
+}
+.switch:hover{color:#f3ebdd;border-color:rgba(255,246,232,.34)}
